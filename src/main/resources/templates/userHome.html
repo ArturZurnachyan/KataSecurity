@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Home Page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h2 class="my-4">Welcome, <span th:text="${user.name}"></span>!</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">User Information</h5>
+            <p class="card-text"><strong>ID:</strong> <span th:text="${user.id}"></span></p>
+            <p class="card-text"><strong>Name:</strong> <span th:text="${user.name}"></span></p>
+            <p class="card-text"><strong>Surname:</strong> <span th:text="${user.surname}"></span></p>
+            <p class="card-text"><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+            <p class="card-text"><strong>Role:</strong> <span th:text="${user.role}"></span></p>
+        </div>
+    </div>
+    <br/>
+    <a th:href="@{/logout}" class="btn btn-danger">Logout</a>
+</div>
+</body>
+</html>
