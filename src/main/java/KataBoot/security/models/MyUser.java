@@ -44,8 +44,8 @@ public class MyUser {
 
     @Column(name = "role")
     @Pattern(message = "Bad formed user role: ${validatedValue} \n" +
-                       "role should be 'USER','ADMIN','ADMIN, USER',or 'USER, ADMIN'",
-            regexp = "^(?i)(Admin|User)(,?(Admin|User))?$")
+                       "role should be 'USER' or 'ADMIN'",
+            regexp = "^(?i)(Admin|User)$")
             private String role;
 
     public MyUser(String name, String surname, String email, String password, String role ) {
@@ -75,7 +75,6 @@ public class MyUser {
     public int getId() {
         return id;
     }
-
 
     public String getName() {
         return name;

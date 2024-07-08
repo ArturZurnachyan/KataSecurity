@@ -30,7 +30,7 @@ public class UserDetailService implements UserDetailsService {
             return User.builder()
                     .username(userObj.getEmail())
                     .password(userObj.getPassword())
-                    .roles(getRoles(userObj))
+                    .roles(getRole(userObj).toUpperCase())
                     .build();
         } else {
             throw new UsernameNotFoundException(email);
@@ -38,10 +38,10 @@ public class UserDetailService implements UserDetailsService {
     }
 
 
-    private String[] getRoles(MyUser user) {
+    private String getRole(MyUser user) {
         if (user.getRole() == null) {
-            return new String[]{"USER"};
+            return "USER";
         }
-        return user.getRole().split(",");
+        return user.getRole();
     }
 }

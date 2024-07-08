@@ -5,10 +5,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 
 import java.io.IOException;
 
 public class AuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
+
+    private final HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
+
 
     @Override
     public void onAuthenticationSuccess(final HttpServletRequest request, final HttpServletResponse response,
@@ -20,6 +24,9 @@ public class AuthenticationSuccessHandler extends SavedRequestAwareAuthenticatio
         } else {
             setDefaultTargetUrl("/user/home");
         }
+
+        requestCache.removeRequest(request, response);
+        clearAuthenticationAttributes(request);
         super.onAuthenticationSuccess(request, response, authentication);
     }
 }

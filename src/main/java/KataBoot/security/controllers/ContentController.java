@@ -1,9 +1,13 @@
 package KataBoot.security.controllers;
 
 import KataBoot.security.models.MyUser;
+import KataBoot.security.service.UserDetailService;
+import KataBoot.security.service.UserRepository;
 import KataBoot.security.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,15 +16,19 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+
+
 @Controller
 public class ContentController {
 
 
     private final UserService userService;
 
+
     @Autowired
     public ContentController( UserService userService) {
         this.userService = userService;
+
     }
 
     @GetMapping("/home")
@@ -28,8 +36,12 @@ public class ContentController {
         return "home";
     }
 
-    @GetMapping("/user/home")
-    public String UserHome() {
+    @GetMapping("user/home")
+    public String userHome(@AuthenticationPrincipal MyUser user, Model model) {
+        if (user == null) {
+            throw new UsernameNotFoundException("User is not authenticated");
+        }
+        model.addAttribute("user", user);
         return "userHome";
     }
 

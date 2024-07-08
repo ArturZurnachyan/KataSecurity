@@ -9,6 +9,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,7 +40,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(registry->{
                     registry.requestMatchers("/home","/register/**").permitAll();
                     registry.requestMatchers("/admin/**").hasRole("ADMIN");
-                    registry.requestMatchers("/user/**").hasRole("USER");
+                    registry.requestMatchers("/user/**").hasAnyRole("USER","ADMIN");
                     registry.anyRequest().authenticated();
                 })
                 .formLogin(httpSecurityFormLoginConfigurer -> {
@@ -47,8 +48,13 @@ public class SecurityConfig {
                             .successHandler(new AuthenticationSuccessHandler())
                             .permitAll();
                 })
+                .sessionManagement(sessionManagementConfigurer -> {
+                    sessionManagementConfigurer.maximumSessions(1).expiredUrl("/login?expired");
+                    sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
+                })
                 .build();
     }
+
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
