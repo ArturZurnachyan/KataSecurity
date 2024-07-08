@@ -38,15 +38,15 @@ public class MyUser {
     @NotEmpty(message = "Email should not be empty")
     private String email;
 
-    @Size(min = 4, max = 20, message = "Password should be between 4 and 20 characters")
+    @Size(min = 4, message = "Password should be between 4 and 20 characters")
     @Column(name = "password")
     private String password;
 
     @Column(name = "role")
     @Pattern(message = "Bad formed user role: ${validatedValue} \n" +
-                       "role should be 'User','Admin','Admin, User',or 'User, Admin'",
-            regexp = "^(Admin,?User|User,?Admin|Admin|User)$")
-    private String role;
+                       "role should be 'USER','ADMIN','ADMIN, USER',or 'USER, ADMIN'",
+            regexp = "^(?i)(Admin|User)(,?(Admin|User))?$")
+            private String role;
 
     public MyUser(String name, String surname, String email, String password, String role ) {
         this.name = name;

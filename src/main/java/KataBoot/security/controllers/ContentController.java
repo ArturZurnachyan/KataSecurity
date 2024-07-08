@@ -1,8 +1,6 @@
 package KataBoot.security.controllers;
 
 import KataBoot.security.models.MyUser;
-import KataBoot.security.service.UserDetailService;
-import KataBoot.security.service.UserRepository;
 import KataBoot.security.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,16 +15,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class ContentController {
 
-    private final UserDetailService userDetailService;
 
     private final UserService userService;
-    private final UserRepository userRepository;
 
     @Autowired
-    public ContentController(UserDetailService userDetailService, UserService userService, UserRepository userRepository) {
-        this.userDetailService = userDetailService;
+    public ContentController( UserService userService) {
         this.userService = userService;
-        this.userRepository = userRepository;
     }
 
     @GetMapping("/home")
@@ -68,13 +62,13 @@ public class ContentController {
             return "edit";
         }
         userService.updateUser(user, user.getId());
-        return "redirect:/user";
+        return "redirect:/admin/home";
     }
 
     @PostMapping("/admin/delete")
     public String deleteUser(@RequestParam(name = "id") int id) {
         userService.deleteUser(id);
-        return "redirect:/user";
+        return "redirect:/admin/home";
     }
     @GetMapping("/admin/home")
     public String getUsers(Model model) {
