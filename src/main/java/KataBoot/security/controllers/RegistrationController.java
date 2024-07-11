@@ -1,7 +1,7 @@
 package KataBoot.security.controllers;
 
-import KataBoot.security.models.MyUser;
-import KataBoot.security.service.UserRepository;
+import KataBoot.security.models.User;
+import KataBoot.security.repositories.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,10 +18,9 @@ public class RegistrationController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @PostMapping("/register/user")
-    public MyUser registerUser(@Valid @RequestBody MyUser user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
-    }
-
+//    @PostMapping("/admin/register")
+//    public User registerUser(@Valid @RequestBody User user) {
+//        user.setPassword(passwordEncoder.encode(user.getPassword()));
+//        return userRepository.save(user);
+//    }
 }

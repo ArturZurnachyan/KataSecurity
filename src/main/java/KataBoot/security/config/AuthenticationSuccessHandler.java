@@ -1,4 +1,4 @@
-package KataBoot.security;
+package KataBoot.security.config;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

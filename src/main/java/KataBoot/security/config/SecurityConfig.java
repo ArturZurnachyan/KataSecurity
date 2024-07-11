@@ -1,6 +1,7 @@
 package KataBoot.security.config;
 
-import KataBoot.security.AuthenticationSuccessHandler;
+import KataBoot.security.service.UserDetailServiceImp;
+import com.sun.net.httpserver.Authenticator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,10 +21,10 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
 
-    private final UserDetailsService userDetailsService;
+    private final UserDetailServiceImp userDetailsService;
 
     @Autowired
-    public SecurityConfig(UserDetailsService userDetailsService) {
+    public SecurityConfig(UserDetailServiceImp userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
 
@@ -52,6 +53,7 @@ public class SecurityConfig {
                     sessionManagementConfigurer.maximumSessions(1).expiredUrl("/login?expired");
                     sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
                 })
+                .exceptionHandling(exceptionHandlingConfigurer -> exceptionHandlingConfigurer.accessDeniedPage("/error"))
                 .build();
     }
 

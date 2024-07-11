@@ -1,13 +1,13 @@
 package KataBoot.security.controllers;
 
-import KataBoot.security.models.MyUser;
-import KataBoot.security.service.UserDetailService;
-import KataBoot.security.service.UserRepository;
+import KataBoot.security.models.User;
+import KataBoot.security.service.RoleService;
 import KataBoot.security.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
 
 
 @Controller
@@ -23,10 +24,13 @@ public class ContentController {
 
 
     private final UserService userService;
-
+    private final RoleService roleService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public ContentController( UserService userService) {
+    public ContentController( UserService userService, RoleService roleService, PasswordEncoder passwordEncoder ) {
+        this.passwordEncoder = passwordEncoder;
+        this.roleService=roleService;
         this.userService = userService;
 
     }
@@ -37,7 +41,7 @@ public class ContentController {
     }
 
     @GetMapping("user/home")
-    public String userHome(@AuthenticationPrincipal MyUser user, Model model) {
+    public String userHome(@AuthenticationPrincipal User user, Model model) {
         if (user == null) {
             throw new UsernameNotFoundException("User is not authenticated");
         }
@@ -49,42 +53,58 @@ public class ContentController {
     public String Login() {
         return "login";
     }
+
+
     @GetMapping("admin/new")
-    public String NewUser(@ModelAttribute("user") MyUser user) {
+    public String NewUser(Model model) {
+        model.addAttribute("user", new User());
+        model.addAttribute("roles", roleService.findAll());
         return "new";
     }
 
-    @PostMapping("/save")
-    public String CreateUser(@ModelAttribute("user") @Valid MyUser user, BindingResult result) {
+    @PostMapping("/admin/register")
+    public String CreateUser(@ModelAttribute("user") @Valid User user, BindingResult result,
+                             @RequestParam("selectedRoles") List<Long> selectedRoles) {
         if (result.hasErrors()) {
             return "new";
         }
-        userService.saveUser(user);
+
+        if (selectedRoles.isEmpty()) {
+            result.rejectValue("selectedRoles", "error.user", "Выберите хотя бы одну роль");
+            return "new";
+        }
+
+        userService.saveUserWithRoles(user,selectedRoles);
         return "redirect:/admin/home";
     }
+
+
     @GetMapping("/admin/edit")
-    public String edit(@RequestParam("id")int id, Model model){
-        model.addAttribute("user", userService.getUser(id));
+    public String edit(Model model, @RequestParam(value = "id") long id){
+
+        model.addAttribute("user", userService.getUserById(id));
+        model.addAttribute("roles", roleService.findAll());
         return "edit";
     }
 
     @PostMapping("/admin/update")
-    public String updateUser(@RequestParam("id")int id,@ModelAttribute("user") @Valid MyUser user, BindingResult result) {
+    public String updateUser(@ModelAttribute("user") @Valid User user, BindingResult result,
+                             @RequestParam("selectedRoles")List<Long> selectedRoles) {
         if (result.hasErrors()) {
             return "edit";
         }
-        userService.updateUser(user, user.getId());
+        userService.updateUser(user, selectedRoles);
         return "redirect:/admin/home";
     }
 
-    @PostMapping("/admin/delete")
-    public String deleteUser(@RequestParam(name = "id") int id) {
+    @GetMapping("/admin/delete")
+    public String deleteUser(@RequestParam(name = "id") long id) {
         userService.deleteUser(id);
         return "redirect:/admin/home";
     }
     @GetMapping("/admin/home")
     public String getUsers(Model model) {
-        model.addAttribute("users", userService.getAllUsers());
+        model.addAttribute("users", userService.findAll());
         return "adminHome";
     }
 }

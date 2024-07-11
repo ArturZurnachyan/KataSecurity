@@ -1,10 +1,13 @@
-package KataBoot.security.service;
+package KataBoot.security.repositories;
 
-import KataBoot.security.models.MyUser;
+import KataBoot.security.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<MyUser, Long> {
-    Optional<MyUser> findByEmail(String email);
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
+    Optional<User> findByEmail(String email);
+    Optional<User> findById(Long id);
 }

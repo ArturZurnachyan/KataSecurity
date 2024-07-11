@@ -16,7 +16,10 @@
             <p class="card-text"><strong>Name:</strong> <span th:text="${user.getName()}"></span></p>
             <p class="card-text"><strong>Surname:</strong> <span th:text="${user.getSurname()}"></span></p>
             <p class="card-text"><strong>Email:</strong> <span th:text="${user.getEmail()}"></span></p>
-            <p class="card-text"><strong>Role:</strong> <span th:text="${user.getRole()}"></span></p>
+            <p class="card-text">
+                <strong>Role:</strong>
+                <span th:each="role, iterStat : ${user.roleList}" th:text="${role.role }"></span>
+            </p>
         </div>
     </div>
     <br/>
