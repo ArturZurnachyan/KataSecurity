@@ -5,9 +5,9 @@ import KataBoot.security.service.RoleService;
 import KataBoot.security.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -23,13 +23,13 @@ import java.util.List;
 public class ContentController {
 
 
+
     private final UserService userService;
     private final RoleService roleService;
-    private final PasswordEncoder passwordEncoder;
+
 
     @Autowired
-    public ContentController( UserService userService, RoleService roleService, PasswordEncoder passwordEncoder ) {
-        this.passwordEncoder = passwordEncoder;
+    public ContentController( UserService userService, RoleService roleService) {
         this.roleService=roleService;
         this.userService = userService;
 
@@ -45,9 +45,28 @@ public class ContentController {
         if (user == null) {
             throw new UsernameNotFoundException("User is not authenticated");
         }
+        model.addAttribute("page","user-home");
         model.addAttribute("user", user);
+        List<String> roles = user.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority) // Получаем строковое представление каждой роли
+                .toList();
+        model.addAttribute("roleList", roles);
         return "userHome";
     }
+
+    @GetMapping("/admin/home")
+    public String getUsers(Model model,@AuthenticationPrincipal User user) {
+        model.addAttribute("user", user);
+        model.addAttribute("users", userService.findAll());
+        model.addAttribute("roles", user.getRoleList());
+        model.addAttribute("page","admin-home");
+        List<String> roles = user.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority) // Получаем строковое представление каждой роли
+                .toList();
+        model.addAttribute("roleList", roles);
+        return "adminHome";
+    }
+
 
     @GetMapping("/login")
     public String Login() {
@@ -81,8 +100,7 @@ public class ContentController {
 
     @GetMapping("/admin/edit")
     public String edit(Model model, @RequestParam(value = "id") long id){
-
-        model.addAttribute("user", userService.getUserById(id));
+        model.addAttribute("editUser", userService.getUserById(id));
         model.addAttribute("roles", roleService.findAll());
         return "edit";
     }
@@ -101,10 +119,5 @@ public class ContentController {
     public String deleteUser(@RequestParam(name = "id") long id) {
         userService.deleteUser(id);
         return "redirect:/admin/home";
-    }
-    @GetMapping("/admin/home")
-    public String getUsers(Model model) {
-        model.addAttribute("users", userService.findAll());
-        return "adminHome";
     }
 }

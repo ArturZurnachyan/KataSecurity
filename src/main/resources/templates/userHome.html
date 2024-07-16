@@ -3,27 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Home Page</title>
+    <title>User Home</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .navbar-custom {
+            background-color: #343a40;
+            color: #fff;
+            height: 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            z-index: 1030; /* устанавливаем выше чем у левой боковой панели */
+        }
+        .navbar-custom .navbar-text {
+            color: #fff;
+            margin-right: 20px;
+            white-space: nowrap; /* чтобы текст не переносился */
+            overflow: hidden; /* скрытие части текста, которая не помещается */
+            text-overflow: ellipsis; /* отображение многоточия в конце строки */
+        }
+        .navbar-custom .btn-logout {
+            color: #fff;
+            padding: 4px;
+            margin-top: -25px;
+        }
+        .sidebar {
+            height: 100vh;
+            background-color: #f8f9fa;
+            padding: 15px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 200px;
+            z-index: 1020; /* устанавливаем ниже чем у navbar */
+            margin-top: 60px; /* учитываем высоту navbar для отступа */
+        }
+        .main-content {
+            margin-left: 220px;
+            padding: 20px;
+        }
+        .nav-link {
+            cursor: pointer;
+            display: block;
+            margin: 10px 0;
+        }
+        .btn-logout {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-    <h2 class="my-4">Welcome, <span th:text="${user.getName()}"></span>!</h2>
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">User Information</h5>
-            <p class="card-text"><strong>ID:</strong> <span th:text="${user.getId()}"></span></p>
-            <p class="card-text"><strong>Name:</strong> <span th:text="${user.getName()}"></span></p>
-            <p class="card-text"><strong>Surname:</strong> <span th:text="${user.getSurname()}"></span></p>
-            <p class="card-text"><strong>Email:</strong> <span th:text="${user.getEmail()}"></span></p>
-            <p class="card-text">
-                <strong>Role:</strong>
-                <span th:each="role, iterStat : ${user.roleList}" th:text="${role.role }"></span>
-            </p>
+<header>
+    <nav class="navbar navbar-dark bg-dark p-0 shadow ">
+        <div class="nav-item text-white px-3">
+            <span class="fw-bold" th:text="${user.getEmail()}"></span>
+            <span>with roles:</span>
+            <span th:each="role : ${roleList}"
+                  th:text="${#strings.substring(role,5)} + ' '">
+            </span>
         </div>
-    </div>
-    <br/>
-    <a th:href="@{/logout}" class="btn btn-danger">Logout</a>
+        <ul class="navbar-nav">
+            <li class="nav-item text-nowrap">
+                <a class="nav-link px-3" href="/logout">Logout</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<div class="sidebar">
+    <h5>Navigation</h5>
+    <a th:href="@{/user/home}" class="nav-link active" th:if="${#lists.contains(roleList , 'ROLE_USER')}" >User Home</a>
+    <a th:href="@{/admin/home}" class="nav-link active" th:if="${#lists.contains(roleList, 'ROLE_ADMIN')}" >Admin Home</a>
 </div>
+
+<div class="main-content">
+    <span class="badge text-bg-light" style="font-size: 3rem;">User Information-page</span>
+    <div class="card">
+                <h2 class="card-header">About user</h2>
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Surname</th>
+                        <th>Email</th>
+                        <th>Password</th>
+                        <th>Role</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td th:text="${user.id}"></td>
+                        <td th:text="${user.name}"></td>
+                        <td th:text="${user.surname}"></td>
+                        <td th:text="${user.email}"></td>
+                        <td th:text="${user.password}"></td>
+                        <td>
+                            <ul>
+                                <li th:each="role : ${user.roleList}" th:text="${role.role}"></li>
+                            </ul>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+    </div>
 </body>
 </html>
